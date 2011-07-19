@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+
+if [ ! -d buildroot ]; then
+    git clone git://git.buildroot.net/buildroot
+fi
+
+cd buildroot
+git fetch --all --prune
+git checkout --detach 2011.05
+

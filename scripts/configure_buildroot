@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+
+mkdir -p build/buildroot
+mkdir -p build/target
+
+ln -sf ../target build/buildroot/target
+
+cp config/buildroot.config build/buildroot/.config
+
+ncpu=$(grep -c ^processor /proc/cpuinfo)
+if [ "$ncpu" -gt 1 ]; then
+    sed -i -e "s/BR2_JLEVEL=.*$/BR2_JLEVEL=$ncpu/" build/buildroot/.config
+fi
+
+make -C buildroot O=$PWD/build/buildroot oldconfig
+
+
