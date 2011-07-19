@@ -2,3 +2,4 @@ build
 kernel
 buildroot
 sosboot.img
+download
