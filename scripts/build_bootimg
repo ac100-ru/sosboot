@@ -1,0 +1,6 @@
+#!/bin/bash
+#
+
+abootimg --create sosboot.img -f config/bootimg.cfg -k build/zImage -r build/initrd.img
+ls -l sosboot.img
+
