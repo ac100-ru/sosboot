@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+
+fakeroot abootimg-pack-initrd -f build/initrd.img build/target
+
