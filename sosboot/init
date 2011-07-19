@@ -1,0 +1,13 @@
+#!/bin/sh
+
+mount -t sysfs none /sys
+mount -t proc none /proc
+mount -t tmpfs none /dev
+
+echo /sbin/mdev > /proc/sys/kernel/hotplug
+mdev -s
+
+while true; do
+    setsid /bin/sh -c 'exec /bin/sh < /dev/tty1 > /dev/tty1 2>&1'
+done
+
