@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+
+if [ ! -d kernel ]; then
+    mkdir -p download
+    echo "Downloading kernel..."
+    wget http://gitorious.org/ac100/marvin24s-kernel/archive-tarball/ca20bea1 -O download/kernel.tar.gz
+    if [[ "$(file download/kernel.tar.gz)" =~ "text" ]]; then
+        cat download/kernel.tar.gz
+        echo
+        exit 1
+    fi
+    
+    echo "Extracting kernel..."
+    tar xzf download/kernel.tar.gz
+    mv ac100-marvin24s-kernel kernel
+fi
+

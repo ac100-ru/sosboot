@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+
+OPTS=
+
+ncpu=$(grep -c ^processor /proc/cpuinfo)
+if [ "$ncpu" -gt 1 ]; then
+    OPTS="$OPTS -j$ncpu"
+fi
+
+make -C kernel ARCH=arm CROSS_COMPILE="ccache arm-linux-gnueabi-" O=$PWD/build/kernel $OPTS zImage
+
+ln -sf kernel/arch/arm/boot/zImage build/zImage
+
