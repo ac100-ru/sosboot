@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+
+tegrarecover=
+
+echo "connect your AC100 mini-usb to the host PC"
+echo "Power it up in recovery-mode (CTRL+ESC)"
+
+while [ -z "$tegrarecover" ]; do
+    tegrarecover=$(lsusb -d 0955:7820)
+    echo -n "."
+    sleep 2
+done
+echo
+
+nvflash --bl /usr/lib/nvflash/bootloader.bin --sync
+nvflash -r --download 7 sosboot.img
+
