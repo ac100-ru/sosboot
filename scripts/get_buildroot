@@ -2,10 +2,30 @@
 #
 
 if [ ! -d buildroot ]; then
+    echo
+    echo "Cloning buildroot from git..."
     git clone git://git.buildroot.net/buildroot
 fi
 
 cd buildroot
+
+echo
+echo "Fetching updates..."
 git fetch --all --prune
-git checkout --detach 2011.05
+
+echo
+echo "Checking out..."
+git checkout -f --detach 2011.05
+git clean -f -d
+
+cd ..
+
+echo
+for p in patches/buildroot-*.patch; do
+    echo "Applying patch $p ..."
+    patch -d buildroot -p1 < $p
+    echo
+done
+
+echo "done."
 
