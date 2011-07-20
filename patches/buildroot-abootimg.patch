@@ -1,0 +1,70 @@
+commit 2864c921f49ff8dbe87a7044d4c951410c17b9c4
+Author: Gilles Grandou <gilles@grandou.net>
+Date:   Wed Jul 20 23:11:46 2011 +0200
+
+    abootimg: new package
+
+diff --git a/package/Config.in b/package/Config.in
+index 40f523d..95f8f17 100644
+--- a/package/Config.in
++++ b/package/Config.in
+@@ -149,6 +149,7 @@ source "package/xvkbd/Config.in"
+ endmenu
+ 
+ menu "Hardware handling"
++source "package/abootimg/Config.in"
+ source "package/acpid/Config.in"
+ source "package/cdrkit/Config.in"
+ source "package/cramfs/Config.in"
+diff --git a/package/abootimg/Config.in b/package/abootimg/Config.in
+new file mode 100644
+index 0000000..b7f935b
+--- /dev/null
++++ b/package/abootimg/Config.in
+@@ -0,0 +1,17 @@
++config BR2_PACKAGE_ABOOTIMG
++	bool "abootimg"
++	depends on BR2_PACKAGE_E2FSPROGS_LIBBLKID
++	help
++	  Tool to read/write/update android boot images
++	  
++	  Android devices use a special partition format to boot any
++	  operating system on the devices. These boot-images contain
++	  a kernel image, a ramdisk, optionally a 2nd stage boot loader
++	  and the commandline passed to the kernel when booting.
++	  The original mkbootimg from Android can only create these images
++	  where abootimg can also extract and modify them.
++	  Handling android boot images is necessary when bringing other
++	  operating systems to android devices.
++	  
++	  http://gitorious.org/ac100/abootimg
++
+diff --git a/package/abootimg/abootimg.mk b/package/abootimg/abootimg.mk
+new file mode 100644
+index 0000000..6e33ebd
+--- /dev/null
++++ b/package/abootimg/abootimg.mk
+@@ -0,0 +1,23 @@
++#############################################################
++#
++# abootimg
++#
++#############################################################
++
++ABOOTIMG_VERSION = v0.6
++ABOOTIMG_SITE = git://gitorious.org/ac100/abootimg.git
++ABOOTIMG_DEPENDENCIES = e2fsprogs
++
++define ABOOTIMG_BUILD_CMDS
++	echo "#define VERSION_STR \"$(ABOOTIMG_VERSION)\"" > $(@D)/version.h
++	$(MAKE) CC="$(TARGET_CC)" lD="$(TARGET_LD)" CFLAGS=-Os -C $(@D) all
++endef
++
++define ABOOTIMG_INSTALL_TARGET_CMDS
++	$(INSTALL) -m 0755 $(@D)/abootimg $(TARGET_DIR)/usr/bin
++	$(INSTALL) -m 0755 $(@D)/pack-initrd $(TARGET_DIR)/usr/bin/abootimg-pack-initrd
++	$(INSTALL) -m 0755 $(@D)/unpack-initrd $(TARGET_DIR)/usr/bin/abootimg-unpack-initrd
++endef
++
++$(eval $(call GENTARGETS,package,abootimg))
++
