@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 
+rel=$(cat release)
+
 tegrarecover=
 
 echo "connect your AC100 mini-usb to the host PC"
@@ -14,5 +16,5 @@ done
 echo
 
 nvflash --bl /usr/lib/nvflash/bootloader.bin --sync
-nvflash -r --download 7 sosboot.img
+nvflash -r --download 7 sosboot-$rel.img
 
