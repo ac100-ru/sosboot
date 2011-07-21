@@ -1,0 +1,16 @@
+#!/bin/sh
+#
+
+./scripts/get_kernel
+./scripts/configure_kernel
+./scripts/build_kernel
+
+./scripts/get_buildroot
+./scripts/configure_buildroot
+./scripts/build_buildroot
+
+./scripts/build_sosboot
+./scripts/build_bootimg
+
+#./scripts/flash_bootimage
+
