@@ -1,0 +1,100 @@
+diff --git a/package/e2fsprogs/e2fsprogs.mk b/package/e2fsprogs/e2fsprogs.mk
+index cf1a6b8..e59c068 100644
+--- a/package/e2fsprogs/e2fsprogs.mk
++++ b/package/e2fsprogs/e2fsprogs.mk
+@@ -26,19 +26,19 @@ define HOST_E2FSPROGS_INSTALL_CMDS
+ endef
+ 
+ # binaries to keep or remove
+-E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_BADBLOCKS) += usr/sbin/badblocks
+-E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_BLKID) += usr/sbin/blkid
++E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_BADBLOCKS) += sbin/badblocks
++E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_BLKID) += sbin/blkid
+ E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_CHATTR) += usr/bin/chattr
+-E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_DUMPE2FS) += usr/sbin/dumpe2fs
++E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_DUMPE2FS) += sbin/dumpe2fs
+ E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_E2FREEFRAG) += usr/sbin/e2freefrag
+-E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_E2FSCK) += usr/sbin/e2fsck
+-E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_E2LABEL) += usr/sbin/e2label
+-E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_E2UNDO) += usr/sbin/e2undo
++E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_E2FSCK) += sbin/e2fsck
++E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_E2LABEL) += sbin/e2label
++E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_E2UNDO) += sbin/e2undo
+ E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_FILEFRAG) += usr/sbin/filefrag
+-E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_FSCK) += usr/sbin/fsck
+-E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_LOGSAVE) += usr/sbin/logsave
++E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_FSCK) += sbin/fsck
++E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_LOGSAVE) += sbin/logsave
+ E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_LSATTR) += usr/bin/lsattr
+-E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_MKE2FS) += usr/sbin/mke2fs
++E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_MKE2FS) += sbin/mke2fs
+ E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_MKLOSTFOUND) += usr/sbin/mklost+found
+ E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_UUIDD) += usr/sbin/uuidd
+ E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_UUIDGEN) += usr/bin/uuidgen
+@@ -53,12 +53,12 @@ E2FSPROGS_BINTARGETS_$(BR2_PACKAGE_E2FSPROGS_UTILS) += usr/lib/libss.so*
+ 
+ # files to remove
+ E2FSPROGS_TXTTARGETS_ = \
+-	usr/sbin/mkfs.ext[234] \
+-	usr/sbin/mkfs.ext4dev \
+-	usr/sbin/fsck.ext[234] \
+-	usr/sbin/fsck.ext4dev \
+-	usr/sbin/findfs \
+-	usr/sbin/tune2fs
++	sbin/mkfs.ext[234] \
++	sbin/mkfs.ext4dev \
++	sbin/fsck.ext[234] \
++	sbin/fsck.ext4dev \
++	sbin/findfs \
++	sbin/tune2fs
+ 
+ define E2FSPROGS_TARGET_REMOVE_UNNEEDED
+ 	rm -f $(addprefix $(TARGET_DIR)/, $(E2FSPROGS_BINTARGETS_))
+@@ -68,10 +68,10 @@ endef
+ E2FSPROGS_POST_INSTALL_TARGET_HOOKS += E2FSPROGS_TARGET_REMOVE_UNNEEDED
+ 
+ define E2FSPROGS_TARGET_MKE2FS_SYMLINKS
+-	ln -sf mke2fs $(TARGET_DIR)/usr/sbin/mkfs.ext2
+-	ln -sf mke2fs $(TARGET_DIR)/usr/sbin/mkfs.ext3
+-	ln -sf mke2fs $(TARGET_DIR)/usr/sbin/mkfs.ext4
+-	ln -sf mke2fs $(TARGET_DIR)/usr/sbin/mkfs.ext4dev
++	ln -sf mke2fs $(TARGET_DIR)/sbin/mkfs.ext2
++	ln -sf mke2fs $(TARGET_DIR)/sbin/mkfs.ext3
++	ln -sf mke2fs $(TARGET_DIR)/sbin/mkfs.ext4
++	ln -sf mke2fs $(TARGET_DIR)/sbin/mkfs.ext4dev
+ endef
+ 
+ ifeq ($(BR2_PACKAGE_E2FSPROGS_MKE2FS),y)
+@@ -79,10 +79,10 @@ E2FSPROGS_POST_INSTALL_TARGET_HOOKS += E2FSPROGS_TARGET_MKE2FS_SYMLINKS
+ endif
+ 
+ define E2FSPROGS_TARGET_E2FSCK_SYMLINKS
+-	ln -sf e2fsck $(TARGET_DIR)/usr/sbin/fsck.ext2
+-	ln -sf e2fsck $(TARGET_DIR)/usr/sbin/fsck.ext3
+-	ln -sf e2fsck $(TARGET_DIR)/usr/sbin/fsck.ext4
+-	ln -sf e2fsck $(TARGET_DIR)/usr/sbin/fsck.ext4dev
++	ln -sf e2fsck $(TARGET_DIR)/sbin/fsck.ext2
++	ln -sf e2fsck $(TARGET_DIR)/sbin/fsck.ext3
++	ln -sf e2fsck $(TARGET_DIR)/sbin/fsck.ext4
++	ln -sf e2fsck $(TARGET_DIR)/sbin/fsck.ext4dev
+ endef
+ 
+ ifeq ($(BR2_PACKAGE_E2FSPROGS_E2FSCK),y)
+@@ -90,7 +90,7 @@ E2FSPROGS_POST_INSTALL_TARGET_HOOKS += E2FSPROGS_TARGET_E2FSCK_SYMLINKS
+ endif
+ 
+ define E2FSPROGS_TARGET_TUNE2FS_SYMLINK
+-	ln -sf e2label $(TARGET_DIR)/usr/sbin/tune2fs
++	ln -sf e2label $(TARGET_DIR)/sbin/tune2fs
+ endef
+ 
+ ifeq ($(BR2_PACKAGE_E2FSPROGS_TUNE2FS),y)
+@@ -98,7 +98,7 @@ E2FSPROGS_POST_INSTALL_TARGET_HOOKS += E2FSPROGS_TARGET_TUNE2FS_SYMLINK
+ endif
+ 
+ define E2FSPROGS_TARGET_FINDFS_SYMLINK
+-	ln -sf e2label $(TARGET_DIR)/usr/sbin/findfs
++	ln -sf e2label $(TARGET_DIR)/sbin/findfs
+ endef
+ 
+ ifeq ($(BR2_PACKAGE_E2FSPROGS_FINDFS),y)
