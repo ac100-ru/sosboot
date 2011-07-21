@@ -1,0 +1,27 @@
+diff --git a/package/busybox/busybox.mk b/package/busybox/busybox.mk
+index 711d11b..9c0b377 100644
+--- a/package/busybox/busybox.mk
++++ b/package/busybox/busybox.mk
+@@ -40,6 +40,14 @@ define BUSYBOX_SET_MDEV
+ 	$(call KCONFIG_ENABLE_OPT,CONFIG_FEATURE_MDEV_LOAD_FIRMWARE,$(BUSYBOX_BUILD_CONFIG))
+ endef
+ endif
++ifeq ($(BR2_PACKAGE_E2FSPROGS_FSCK),y)
++define BUSYBOX_UNSET_FSCK
++	$(call KCONFIG_DISABLE_OPT,CONFIG_FSCK,$(BUSYBOX_BUILD_CONFIG))
++	$(call KCONFIG_DISABLE_OPT,CONFIG_CHATTR,$(BUSYBOX_BUILD_CONFIG))
++	$(call KCONFIG_DISABLE_OPT,CONFIG_LSATTR,$(BUSYBOX_BUILD_CONFIG))
++endef
++endif
++
+ 
+ # If we have external syslogd, force busybox to use it
+ ifeq ($(BR2_PACKAGE_SYSKLOGD),y)
+@@ -136,6 +144,7 @@ define BUSYBOX_CONFIGURE_CMDS
+ 	$(BUSYBOX_SET_RPC)
+ 	$(BUSYBOX_PREFER_STATIC)
+ 	$(BUSYBOX_SET_MDEV)
++	$(BUSYBOX_UNSET_FSCK)
+ 	$(BUSYBOX_NETKITBASE)
+ 	$(BUSYBOX_NETKITTELNET)
+ 	@yes "" | $(MAKE) ARCH=$(KERNEL_ARCH) CROSS_COMPILE="$(TARGET_CROSS)" \
