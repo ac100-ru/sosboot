@@ -1,0 +1,56 @@
+diff --git a/package/dosfstools/dosfstools.mk b/package/dosfstools/dosfstools.mk
+index c2d763d..997b752 100644
+--- a/package/dosfstools/dosfstools.mk
++++ b/package/dosfstools/dosfstools.mk
+@@ -15,19 +15,46 @@ define DOSFSTOOLS_BUILD_CMDS
+ 		CC="$(TARGET_CC)" -C $(@D)
+ endef
+ 
+-DOSFSTOOLS_INSTALL_BIN_FILES_$(BR2_PACKAGE_DOSFSTOOLS_MKDOSFS)+=$(MKDOSFS_BINARY)
+-DOSFSTOOLS_INSTALL_BIN_FILES_$(BR2_PACKAGE_DOSFSTOOLS_DOSFSCK)+=$(DOSFSCK_BINARY)
+-DOSFSTOOLS_INSTALL_BIN_FILES_$(BR2_PACKAGE_DOSFSTOOLS_DOSFSLABEL)+=$(DOSFSLABEL_BINARY)
++
++
++
++
++ifeq ($(BR2_PACKAGE_DOSFSTOOLS_MKDOSFS),y)
++define DOSFSTOOLS_INSTALL_MKFS
++	install -m 755 $(@D)/$(MKDOSFS_BINARY) $(TARGET_DIR)/sbin
++	ln -s $(MKDOSFS_BINARY) $(TARGET_DIR)/sbin/mkfs.msdos
++	ln -s $(MKDOSFS_BINARY) $(TARGET_DIR)/sbin/mkfs.vfat
++endef
++endif
++
++ifeq ($(BR2_PACKAGE_DOSFSTOOLS_DOSFSCK),y)
++define DOSFSTOOLS_INSTALL_FSCK
++	install -m 755 $(@D)/$(DOSFSCK_BINARY) $(TARGET_DIR)/sbin
++	ln -s $(DOSFSCK_BINARY) $(TARGET_DIR)/sbin/fsck.msdos
++	ln -s $(DOSFSCK_BINARY) $(TARGET_DIR)/sbin/fsck.vfat
++endef
++endif
++
++ifeq ($(BR2_PACKAGE_DOSFSTOOLS_DOSFSLABEL),y)
++define DOSFSTOOLS_INSTALL_DOSFSLABEL
++	install -m 755 $(@D)/$(DOSFSLABEL_BINARY) $(TARGET_DIR)/sbin
++endef
++endif
+ 
+ define DOSFSTOOLS_INSTALL_TARGET_CMDS
+-	test -z "$(DOSFSTOOLS_INSTALL_BIN_FILES_y)" || \
+-	install -m 755 $(addprefix $(@D)/,$(DOSFSTOOLS_INSTALL_BIN_FILES_y)) $(TARGET_DIR)/sbin/
++	$(DOSFSTOOLS_INSTALL_MKFS)
++	$(DOSFSTOOLS_INSTALL_FSCK)
++	$(DOSFSTOOLS_INSTALL_DOSFSLABEL)
+ endef
+ 
+ define DOSFSTOOLS_UNINSTALL_TARGET_CMDS
+ 	rm -f $(TARGET_DIR)/sbin/$(MKDOSFS_BINARY)
+ 	rm -f $(TARGET_DIR)/sbin/$(DOSFSCK_BINARY)
+ 	rm -f $(TARGET_DIR)/sbin/$(DOSFSLABEL_BINARY)
++	rm -f $(TARGET_DIR)/sbin/fsck.msdos
++	rm -f $(TARGET_DIR)/sbin/fsck.vfat
++	rm -f $(TARGET_DIR)/sbin/mkfs.msdos
++	rm -f $(TARGET_DIR)/sbin/mkfs.vfat
+ endef
+ 
+ define DOSFSTOOLS_CLEAN_CMDS
