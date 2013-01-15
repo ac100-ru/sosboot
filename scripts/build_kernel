@@ -11,4 +11,5 @@ fi
 make -C kernel ARCH=arm CROSS_COMPILE="ccache arm-linux-gnueabi-" O=$PWD/build/kernel $OPTS zImage
 
 ln -sf kernel/arch/arm/boot/zImage build/zImage
+ln -sf kernel/arch/arm/boot/dts/tegra20-paz00.dtb build/tegra20-paz00.dtb
 
