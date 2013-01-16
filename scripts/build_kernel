@@ -12,4 +12,5 @@ make -C kernel ARCH=arm CROSS_COMPILE="ccache arm-linux-gnueabi-" O=$PWD/build/k
 
 ln -sf kernel/arch/arm/boot/zImage build/zImage
 ln -sf kernel/arch/arm/boot/dts/tegra20-paz00.dtb build/tegra20-paz00.dtb
+cat build/zImage build/tegra20-paz00.dtb > build/zImage-combined
 
