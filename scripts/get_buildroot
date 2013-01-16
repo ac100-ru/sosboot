@@ -26,12 +26,12 @@ git clean -f -d
 
 cd ..
 
-#echo
-#for p in patches/buildroot-*.patch; do
-#    echo "Applying patch $p ..."
-#    patch -d buildroot -p1 < $p
-#    echo
-#done
+echo
+for p in patches/buildroot-*.patch; do
+    echo "Applying patch $p ..."
+    patch -d buildroot -p1 < $p
+    echo
+done
 
 echo "done."
 
