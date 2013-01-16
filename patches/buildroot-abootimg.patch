@@ -1,21 +1,21 @@
-commit 2864c921f49ff8dbe87a7044d4c951410c17b9c4
-Author: Gilles Grandou <gilles@grandou.net>
-Date:   Wed Jul 20 23:11:46 2011 +0200
+commit e584dd87d33f238f43ce895d097cb10f4d600ebb
+Author: Andrey Danin <danindrey@mail.ru>
+Date:   Wed Jan 16 10:58:59 2013 +0400
 
-    abootimg: new package
+    abootimg: new package (adopted Gilles' Grandou patch)
 
 diff --git a/package/Config.in b/package/Config.in
-index 40f523d..95f8f17 100644
+index 15d7ad6..7b83b8b 100644
 --- a/package/Config.in
 +++ b/package/Config.in
-@@ -149,6 +149,7 @@ source "package/xvkbd/Config.in"
+@@ -196,6 +196,7 @@ source "package/xfsprogs/Config.in"
  endmenu
  
  menu "Hardware handling"
 +source "package/abootimg/Config.in"
  source "package/acpid/Config.in"
  source "package/cdrkit/Config.in"
- source "package/cramfs/Config.in"
+ source "package/dbus/Config.in"
 diff --git a/package/abootimg/Config.in b/package/abootimg/Config.in
 new file mode 100644
 index 0000000..b7f935b
@@ -41,7 +41,7 @@ index 0000000..b7f935b
 +
 diff --git a/package/abootimg/abootimg.mk b/package/abootimg/abootimg.mk
 new file mode 100644
-index 0000000..6e33ebd
+index 0000000..9f6f8c6
 --- /dev/null
 +++ b/package/abootimg/abootimg.mk
 @@ -0,0 +1,23 @@
@@ -66,5 +66,5 @@ index 0000000..6e33ebd
 +	$(INSTALL) -m 0755 $(@D)/unpack-initrd $(TARGET_DIR)/usr/bin/abootimg-unpack-initrd
 +endef
 +
-+$(eval $(call GENTARGETS,package,abootimg))
++$(eval $(generic-package))
 +
