@@ -3,6 +3,6 @@
 
 rel=$(cat release)
 
-abootimg --create sosboot-$rel.img -f config/bootimg.cfg -k build/zImage -r build/initrd.img -c "name=SOSBOOT $rel"
+abootimg --create sosboot-$rel.img -f config/bootimg.cfg -k build/zImage-combined -r build/initrd.img -c "name=SOSBOOT $rel"
 ls -l sosboot-$rel.img
 
