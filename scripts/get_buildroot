@@ -15,7 +15,13 @@ git fetch --all --prune
 
 echo
 echo "Checking out..."
-git checkout -f --detach 2012.11.1
+detach=""
+git help checkout | grep -r '\-\-detach' > /dev/null
+res=$?
+if [[ "$res" == "0" ]]; then
+	detach="--detach"
+fi
+git checkout -f $detach 2012.11.1
 git clean -f -d
 
 cd ..
