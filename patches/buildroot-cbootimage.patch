@@ -1,0 +1,143 @@
+commit 3cc3c52658739382a21756c354d2a982b4fa40f6
+Author: Andrey Danin <danindrey@mail.ru>
+Date:   Thu Jan 17 14:55:19 2013 +0400
+
+    cbootimage: new package
+
+diff --git a/package/Config.in b/package/Config.in
+index 7b83b8b..cd1d5fe 100644
+--- a/package/Config.in
++++ b/package/Config.in
+@@ -198,6 +198,7 @@ endmenu
+ menu "Hardware handling"
+ source "package/abootimg/Config.in"
+ source "package/acpid/Config.in"
++source "package/cbootimage/Config.in"
+ source "package/cdrkit/Config.in"
+ source "package/dbus/Config.in"
+ source "package/dbus-glib/Config.in"
+diff --git a/package/cbootimage/Config.in b/package/cbootimage/Config.in
+new file mode 100644
+index 0000000..e964fd8
+--- /dev/null
++++ b/package/cbootimage/Config.in
+@@ -0,0 +1,10 @@
++config BR2_PACKAGE_CBOOTIMAGE
++	bool "cbootimage"
++	help
++	  cbootimage can compile a text representations of a BCT into a
++	  binary, or combine a binary and a bootloader into a flashable
++	  image.
++	  
++	  https://gitorious.org/cbootimage/cbootimage
++	  http://nv-tegra.nvidia.com/gitweb/?p=tools/cbootimage.git;a=summary	  
++
+diff --git a/package/cbootimage/cbootimage-compilation.patch b/package/cbootimage/cbootimage-compilation.patch
+new file mode 100644
+index 0000000..31e9d4e
+--- /dev/null
++++ b/package/cbootimage/cbootimage-compilation.patch
+@@ -0,0 +1,76 @@
++diff --git a/data_layout.c b/data_layout.c
++index a0b2e11..3ac34ff 100644
++--- a/data_layout.c
+++++ b/data_layout.c
++@@ -29,6 +29,7 @@
++ #include "cbootimage.h"
++ #include "crypto.h"
++ #include "set.h"
+++#include "math.h"
++ #include <sys/param.h>
++ 
++ typedef struct blk_data_rec
++@@ -92,13 +93,12 @@ iceil_log2(u_int32_t a, u_int32_t b)
++ static u_int32_t
++ ceil_log2(u_int32_t a)
++ {
++-	u_int32_t result;
++-
++-	result = log2(a);
++-	if ((1UL << result) < a)
++-		result++;
++-
++-	return result;
+++	int  e;
+++	//ASSERT (a >= 1);
+++	for (e = 0; ; e++)
+++		if ((1 << e) >= a)
+++			break;
+++	return e;
++ }
++ 
++ static void init_bad_block_table(build_image_context *context)
++diff --git a/data_layout.o b/data_layout.o
++index 0dfe7ca..3ffe59f 100644
++Binary files a/data_layout.o and b/data_layout.o differ
++diff --git a/set.c b/set.c
++index 70c9522..35eebd8 100644
++--- a/set.c
+++++ b/set.c
++@@ -181,6 +181,15 @@ context_set_array(build_image_context	*context,
++ 	return 0;
++ }
++ 
+++static inline int32_t ilog2(float x)
+++{
+++	u_int32_t ix = (u_int32_t)x;
+++	u_int32_t exp = (ix >> 23) & 0xFF;
+++	int32_t log2 = ((u_int32_t)exp) - 127;
+++
+++	return log2;
+++}
+++
++ /*
++  * context_set_value(): General handler for setting values in config files.
++  */
++@@ -197,7 +206,7 @@ int context_set_value(build_image_context *context,
++ 
++ 	case token_block_size:
++ 		context->block_size = value;
++-		context->block_size_log2 = log2(value);
+++		context->block_size_log2 = ilog2(value);
++ 
++ 		if (context->memory != NULL) {
++ 			printf("Error: Too late to change block size.\n");
++@@ -225,7 +234,7 @@ int context_set_value(build_image_context *context,
++ 
++ 	case token_page_size:
++ 		context->page_size = value;
++-		context->page_size_log2 = log2(value);
+++		context->page_size_log2 = ilog2(value);
++ 		context->pages_per_blk= 1 << (context->block_size_log2- 
++ 			context->page_size_log2);
++ 
++diff --git a/set.o b/set.o
++index fb29eda..117a068 100644
++Binary files a/set.o and b/set.o differ
+diff --git a/package/cbootimage/cbootimage.mk b/package/cbootimage/cbootimage.mk
+new file mode 100644
+index 0000000..6d92d80
+--- /dev/null
++++ b/package/cbootimage/cbootimage.mk
+@@ -0,0 +1,21 @@
++#############################################################
++#
++# cbootimage
++#
++#############################################################
++
++CBOOTIMAGE_VERSION = 20379c18a25191d9197bb96fd719c99336100055
++CBOOTIMAGE_SITE = git://gitorious.org/cbootimage/cbootimage.git
++CBOOTIMAGE_DEPENDENCIES = util-linux
++
++define CBOOTIMAGE_BUILD_CMDS
++	$(MAKE) CC="$(TARGET_CC)" lD="$(TARGET_LD)" CFLAGS=-Os -C $(@D) all
++endef
++
++define CBOOTIMAGE_INSTALL_TARGET_CMDS
++	$(INSTALL) -m 0755 $(@D)/cbootimage $(TARGET_DIR)/usr/bin
++	$(INSTALL) -m 0755 $(@D)/bct_dump $(TARGET_DIR)/usr/bin
++endef
++
++$(eval $(generic-package))
++
