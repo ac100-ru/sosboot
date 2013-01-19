@@ -1,2 +1,2 @@
-setenv bootargs 'console=tty0 console=ttyS0,115200n8 CMA=64M'
+setenv bootargs 'console=tty0 console=ttyS0,115200n8 CMA=64M quiet splash'
 bootz @KERNEL @INITRD @FDT
