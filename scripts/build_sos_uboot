@@ -6,4 +6,4 @@ rel=$(cat release)
 mkimage -n "sos-$rel" -A arm -O linux -T ramdisk -C gzip -d ./build/initrd.img ./build/initrd-uboot || exit 1
 create_image.pl ./build/uboot.bin ./build/zImage ./build/initrd-uboot ./build/tegra20-paz00.dtb ./config/uboot.scr sos-uboot-$rel.bin
 ls -l  sos-uboot-$rel.bin
-echo 'sudo nvflash --bl sos-uboot-$rel.bin --go'
+echo "tegrarcm --bct=ac100.bct --bootloader=sos-uboot-${rel}.bin --entryaddr=0x108000"
