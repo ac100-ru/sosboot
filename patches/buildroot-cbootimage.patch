@@ -1,6 +1,6 @@
-commit 3cc3c52658739382a21756c354d2a982b4fa40f6
+commit adb69f7fd42245c8193b930306880057d06f1df0
 Author: Andrey Danin <danindrey@mail.ru>
-Date:   Thu Jan 17 14:55:19 2013 +0400
+Date:   Mon Jan 21 11:22:33 2013 +0400
 
     cbootimage: new package
 
@@ -34,23 +34,15 @@ index 0000000..e964fd8
 +
 diff --git a/package/cbootimage/cbootimage-compilation.patch b/package/cbootimage/cbootimage-compilation.patch
 new file mode 100644
-index 0000000..31e9d4e
+index 0000000..e673141
 --- /dev/null
 +++ b/package/cbootimage/cbootimage-compilation.patch
-@@ -0,0 +1,76 @@
+@@ -0,0 +1,67 @@
 +diff --git a/data_layout.c b/data_layout.c
-+index a0b2e11..3ac34ff 100644
++index a0b2e11..ae154a8 100644
 +--- a/data_layout.c
 ++++ b/data_layout.c
-+@@ -29,6 +29,7 @@
-+ #include "cbootimage.h"
-+ #include "crypto.h"
-+ #include "set.h"
-++#include "math.h"
-+ #include <sys/param.h>
-+ 
-+ typedef struct blk_data_rec
-+@@ -92,13 +93,12 @@ iceil_log2(u_int32_t a, u_int32_t b)
++@@ -92,13 +92,12 @@ iceil_log2(u_int32_t a, u_int32_t b)
 + static u_int32_t
 + ceil_log2(u_int32_t a)
 + {
@@ -70,30 +62,32 @@ index 0000000..31e9d4e
 + }
 + 
 + static void init_bad_block_table(build_image_context *context)
-+diff --git a/data_layout.o b/data_layout.o
-+index 0dfe7ca..3ffe59f 100644
-+Binary files a/data_layout.o and b/data_layout.o differ
 +diff --git a/set.c b/set.c
-+index 70c9522..35eebd8 100644
++index 70c9522..a248573 100644
 +--- a/set.c
 ++++ b/set.c
-+@@ -181,6 +181,15 @@ context_set_array(build_image_context	*context,
++@@ -181,6 +181,20 @@ context_set_array(build_image_context	*context,
 + 	return 0;
 + }
 + 
-++static inline int32_t ilog2(float x)
+++static inline int32_t ilog2(u_int32_t x)
 ++{
-++	u_int32_t ix = (u_int32_t)x;
-++	u_int32_t exp = (ix >> 23) & 0xFF;
-++	int32_t log2 = ((u_int32_t)exp) - 127;
+++	int  e;
+++	//ASSERT (a >= 1);
+++	for (e = 0; ; e++)
+++		if ((1 << e) >= x)
+++			break;
 ++
-++	return log2;
+++	if ((1 << e) > x)
+++		e -= 1;
+++
+++	return e;
 ++}
 ++
 + /*
 +  * context_set_value(): General handler for setting values in config files.
 +  */
-+@@ -197,7 +206,7 @@ int context_set_value(build_image_context *context,
++@@ -197,7 +211,7 @@ int context_set_value(build_image_context *context,
 + 
 + 	case token_block_size:
 + 		context->block_size = value;
@@ -102,7 +96,7 @@ index 0000000..31e9d4e
 + 
 + 		if (context->memory != NULL) {
 + 			printf("Error: Too late to change block size.\n");
-+@@ -225,7 +234,7 @@ int context_set_value(build_image_context *context,
++@@ -225,7 +239,7 @@ int context_set_value(build_image_context *context,
 + 
 + 	case token_page_size:
 + 		context->page_size = value;
@@ -111,9 +105,6 @@ index 0000000..31e9d4e
 + 		context->pages_per_blk= 1 << (context->block_size_log2- 
 + 			context->page_size_log2);
 + 
-+diff --git a/set.o b/set.o
-+index fb29eda..117a068 100644
-+Binary files a/set.o and b/set.o differ
 diff --git a/package/cbootimage/cbootimage.mk b/package/cbootimage/cbootimage.mk
 new file mode 100644
 index 0000000..6d92d80
