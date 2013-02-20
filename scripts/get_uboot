@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+
+if [ ! -d uboot ]; then
+    mkdir -p download
+    echo "Downloading uboot..."
+    uboot_url=ftp://ftp.denx.de/pub/u-boot/u-boot-2013.01.01.tar.bz2
+    wget "${uboot_url}" -O download/uboot.tar.bz2
+    echo "Extracting uboot..."
+    tar xjf download/uboot.tar.bz2
+    mv u-boot-2013.01.01 uboot
+fi
+

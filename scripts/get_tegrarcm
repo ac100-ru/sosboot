@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+
+if [ ! -d tegrarcm ]; then
+    echo "Downloading tegrarc..."
+    tegrarcm_url=git://nv-tegra.nvidia.com/tools/tegrarcm.git
+    git clone "${tegrarcm_url}"
+fi
+

@@ -5,12 +5,21 @@
 ./scripts/configure_kernel
 ./scripts/build_kernel
 
+./scripts/get_uboot
+./scripts/build_uboot
+
+./scripts/get_tegrarcm
+./scripts/build_tegrarcm
+
+./scripts/get_createimage
+
 ./scripts/get_buildroot
 ./scripts/configure_buildroot
 ./scripts/build_buildroot
 
 ./scripts/build_sosboot
 ./scripts/build_bootimg
+./scripts/build_sos_uboot
 
 #./scripts/flash_bootimage
 

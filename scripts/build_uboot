@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+
+OPTS=
+
+ncpu=$(grep -c ^processor /proc/cpuinfo)
+if [ "$ncpu" -gt 1 ]; then
+    OPTS="$OPTS -j$ncpu"
+fi
+
+make -C uboot paz00_config CROSS_COMPILE="ccache arm-linux-gnueabi-" O=$PWD/build/uboot $OPTS
+make -C uboot CROSS_COMPILE="ccache arm-linux-gnueabi-" O=$PWD/build/uboot $OPTS
+
+ln -s $PWD/build/uboot/u-boot-dtb-tegra.bin build/uboot.bin

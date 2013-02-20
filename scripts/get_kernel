@@ -7,7 +7,7 @@ if [ ! -d kernel ]; then
     # 2.6.38 ?
     #kernel_url=http://gitorious.org/ac100/marvin24s-kernel/archive-tarball/ca20bea1
     # 3.8
-    kernel_url=http://gitorious.org/ac100/marvin24s-kernel/archive-tarball/13819cd4
+    kernel_url=http://gitorious.org/ac100/marvin24s-kernel/archive-tarball/linux-ac100-3.8
     wget "${kernel_url}" -O download/kernel.tar.gz
     if [[ "$(file download/kernel.tar.gz)" =~ "text" ]]; then
         cat download/kernel.tar.gz

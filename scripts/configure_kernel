@@ -2,7 +2,7 @@
 #
 
 mkdir -p build/kernel
-cp config/kernel.config build/kernel/.config
+# cp config/kernel.config build/kernel/.config
 
-make -C kernel ARCH=arm CROSS_COMPILE="ccache arm-linux-gnueabi-" O=$PWD/build/kernel oldconfig
+make -C kernel ARCH=arm CROSS_COMPILE="ccache arm-linux-gnueabi-" O=$PWD/build/kernel paz00_defconfig
 

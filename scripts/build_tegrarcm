@@ -1,0 +1,16 @@
+#!/bin/bash
+#
+
+OPTS=
+
+ncpu=$(grep -c ^processor /proc/cpuinfo)
+if [ "$ncpu" -gt 1 ]; then
+    OPTS="$OPTS -j$ncpu"
+fi
+
+pushd tegrarcm
+./autogen.sh
+popd
+make -C tegrarcm $OPTS
+
+ln -s $PWD/tegrarcm/src/tegrarcm build/tegrarcm
