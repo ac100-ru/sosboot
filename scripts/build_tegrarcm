@@ -9,8 +9,8 @@ if [ "$ncpu" -gt 1 ]; then
 fi
 
 pushd tegrarcm
-./autogen.sh
+./autogen.sh || exit 1
 popd
-make -C tegrarcm $OPTS
+make -C tegrarcm $OPTS || exit 1
 
-ln -s $PWD/tegrarcm/src/tegrarcm build/tegrarcm
+ln -sf $PWD/tegrarcm/src/tegrarcm build/tegrarcm
