@@ -1,0 +1,51 @@
+diff --git a/package/dosfstools/Config.in b/package/dosfstools/Config.in
+index 1b92026..2156a04 100644
+--- a/package/dosfstools/Config.in
++++ b/package/dosfstools/Config.in
+@@ -1,6 +1,8 @@
+ config BR2_PACKAGE_DOSFSTOOLS
+ 	bool "dosfstools"
+ 	depends on BR2_LARGEFILE
++	depends on BR2_USE_WCHAR
++	select BR2_PACKAGE_LIBICONV if !BR2_ENABLE_LOCALE
+ 	help
+ 	  Tools for creating and checking DOS FAT filesystems.
+ 
+@@ -24,5 +26,5 @@ config BR2_PACKAGE_DOSFSTOOLS_DOSFSLABEL
+ 	help
+ 	  Get or set the DOS FAT filesystem label.
+ 
+-comment "dosfstools requires a toolchain with LARGEFILE support"
+-	depends on !BR2_LARGEFILE
++comment "dosfstools requires a toolchain with LARGEFILE and WCHAR support"
++	depends on !BR2_LARGEFILE || !BR2_USE_WCHAR
+diff --git a/package/dosfstools/dosfstools.mk b/package/dosfstools/dosfstools.mk
+index 6f34428..d5b5ce3 100644
+--- a/package/dosfstools/dosfstools.mk
++++ b/package/dosfstools/dosfstools.mk
+@@ -4,15 +4,21 @@
+ #
+ #############################################################
+ 
+-DOSFSTOOLS_VERSION = 3.0.12
+-DOSFSTOOLS_SITE = http://fossies.org/linux/misc/
++DOSFSTOOLS_VERSION = 3.0.15
++DOSFSTOOLS_SITE = http://fossies.org/linux/misc
+ MKDOSFS_BINARY = mkdosfs
+ DOSFSCK_BINARY = dosfsck
+ DOSFSLABEL_BINARY = dosfslabel
++DOSFSTOOLS_LDFLAGS = $(TARGET_LDFLAGS)
++
++ifneq ($(BR2_ENABLE_LOCALE),y)
++DOSFSTOOLS_DEPENDENCIES += libiconv
++DOSFSTOOLS_LDFLAGS += -liconv
++endif
+ 
+ define DOSFSTOOLS_BUILD_CMDS
+-	$(MAKE) CFLAGS="$(TARGET_CFLAGS)" LDFLAGS="$(TARGET_LDFLAGS)" \
+-		CC="$(TARGET_CC)" -C $(@D)
++	$(MAKE) CFLAGS="$(TARGET_CFLAGS)" CC="$(TARGET_CC)" \
++		LDFLAGS="$(DOSFSTOOLS_LDFLAGS)" -C $(@D)
+ endef
+ 
+ 
