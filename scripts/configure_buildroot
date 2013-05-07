@@ -6,6 +6,7 @@ mkdir -p build/target
 
 ln -sf ../target build/buildroot/target
 
+cp config/busybox.config buildroot/package/busybox/busybox.config
 cp config/buildroot.config build/buildroot/.config
 
 ncpu=$(grep -c ^processor /proc/cpuinfo)
