@@ -3,3 +3,9 @@ kernel
 buildroot
 sosboot.img
 download
+create_bootimage
+uboot
+tegrarcm
+*.img
+*.bin
+tags
