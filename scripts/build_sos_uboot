@@ -3,7 +3,7 @@
 
 rel=$(cat release)
 
-mkimage -n "sos-$rel" -A arm -O linux -T ramdisk -C gzip -d ./build/initrd.img ./build/initrd-uboot || exit 1
+./build/uboot/tools/mkimage -n "sos-$rel" -A arm -O linux -T ramdisk -C gzip -d ./build/initrd.img ./build/initrd-uboot || exit 1
 build/create_image.pl ./build/uboot.bin ./build/zImage ./build/initrd-uboot ./build/tegra20-paz00.dtb ./config/uboot.scr sos-uboot-$rel.bin
 ls -l  sos-uboot-$rel.bin
 echo "build/tegrarcm --bct=bct/ac100-micron.bct --bootloader=sos-uboot-${rel}.bin --loadaddr=0x108000"
