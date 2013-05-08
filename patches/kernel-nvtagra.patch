@@ -1,0 +1,11 @@
+--- a/block/partitions/check.c	2013-05-08 14:32:38.335738547 +0400
++++ b/block/partitions/check.c	2013-05-08 14:22:55.408738409 +0400
+@@ -43,7 +43,7 @@
+ 	 * Probe partition formats with tables at disk address 0
+ 	 * that also have an ADFS boot block at 0xdc0.
+ 	 */
+-#ifdef CONFIG_NVTEGRAPARTITION
++#ifdef CONFIG_NVTEGRA_PARTITION
+ 	nvtegra_partition,
+ #endif
+ #ifdef CONFIG_TEGRAPART_PARTITION
