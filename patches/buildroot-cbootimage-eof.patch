@@ -1,0 +1,32 @@
+From 7151b9d2ae975151fc87717c44ebc9aeee8deecd Mon Sep 17 00:00:00 2001
+From: Andrey Danin <danindrey@mail.ru>
+Date: Wed, 8 May 2013 17:54:56 +0400
+Subject: [PATCH] cbootimage: fix eof check on arm
+
+---
+ package/cbootimage/cbootimage-eof.patch |   13 +++++++++++++
+ 1 files changed, 13 insertions(+), 0 deletions(-)
+ create mode 100644 package/cbootimage/cbootimage-eof.patch
+
+diff --git a/package/cbootimage/cbootimage-eof.patch b/package/cbootimage/cbootimage-eof.patch
+new file mode 100644
+index 0000000..a961993
+--- /dev/null
++++ b/package/cbootimage/cbootimage-eof.patch
+@@ -0,0 +1,13 @@
++diff --git a/parse.c b/parse.c
++index 1005ebc..c9153a1 100644
++--- a/parse.c
+++++ b/parse.c
++@@ -913,7 +913,7 @@ void process_config_file(build_image_context *context)
++ {
++ 	char buffer[MAX_BUFFER];
++ 	int  space = 0;
++-	char current;
+++	int current;
++ 	u_int8_t c_eol_comment_start = 0; // True after first slash
++ 	u_int8_t comment = 0;
++ 	u_int8_t string = 0;
+-- 
+1.7.1
+
