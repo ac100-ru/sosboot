@@ -18,12 +18,5 @@ if [ ! -d kernel ]; then
     echo "Extracting kernel..."
     tar xzf download/kernel.tar.gz
     mv ac100-marvin24s-kernel kernel
-
-    echo
-    for p in patches/kernel-*.patch; do
-        echo "Applying patch $p ..."
-        patch -d kernel -p1 < $p
-        echo
-    done
 fi
 
