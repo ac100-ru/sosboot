@@ -17,6 +17,9 @@
 ./scripts/configure_buildroot || exit 1
 ./scripts/build_buildroot || exit 1
 
+./scripts/get_installers || exit 1
+./scripts/build_installers || exit 1
+
 ./scripts/build_sosboot || exit 1
 ./scripts/build_bootimg || exit 1
 ./scripts/build_sos_uboot || exit 1
