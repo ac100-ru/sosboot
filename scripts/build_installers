@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+
+cp ./build/uboot.bin ac100-self-installers/switch-to-uboot/uboot.bin || exit 1
+
+pushd ac100-self-installers || exit 1
+./build_all
+popd
+
+cp ac100-self-installers/build/switch-to-uboot ./build/target || exit 1
+
