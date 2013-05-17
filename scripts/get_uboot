@@ -2,12 +2,29 @@
 #
 
 if [ ! -d uboot ]; then
-    mkdir -p download
-    echo "Downloading uboot..."
-    uboot_url=ftp://ftp.denx.de/pub/u-boot/u-boot-2013.01.01.tar.bz2
-    wget "${uboot_url}" -O download/uboot.tar.bz2
-    echo "Extracting uboot..."
-    tar xjf download/uboot.tar.bz2
-    mv u-boot-2013.01.01 uboot
+    echo
+    echo "Cloning uboot from git..."
+    git clone git://gitorious.org/u-boot-ac100-exp/u-boot-ac100-exp.git uboot
 fi
+
+cd uboot
+
+echo
+echo "Fetching updates..."
+git fetch --all --prune
+
+echo
+echo "Checking out..."
+detach=""
+git help checkout | grep -r '\-\-detach' > /dev/null
+res=$?
+if [[ "$res" == "0" ]]; then
+	detach="--detach"
+fi
+git checkout -f $detach tegra-master-exp
+git clean -f -d
+
+cd ..
+
+echo "done."
 
