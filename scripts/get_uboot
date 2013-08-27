@@ -4,10 +4,10 @@
 if [ ! -d uboot ]; then
     echo
     echo "Cloning uboot from git..."
-    git clone git://gitorious.org/u-boot-ac100-exp/u-boot-ac100-exp.git uboot
+    git clone git://gitorious.org/u-boot-ac100-exp/u-boot-ac100-exp.git uboot || exit 1
 fi
 
-cd uboot
+cd uboot || exit 1
 
 echo
 echo "Fetching updates..."
@@ -25,6 +25,13 @@ git checkout -f $detach tegra-master-exp
 git clean -f -d
 
 cd ..
+
+echo
+for p in patches/uboot-*.patch; do
+    echo "Applying patch $p ..."
+    patch -d uboot -p1 < $p || exit 1
+    echo
+done
 
 echo "done."
 
