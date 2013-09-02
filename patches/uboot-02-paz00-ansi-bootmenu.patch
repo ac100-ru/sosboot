@@ -1,0 +1,821 @@
+From 48c07bd6d0caaa63fe135dfded679f727af4a8cd Mon Sep 17 00:00:00 2001
+From: Andrey Danin <danindrey@mail.ru>
+Date: Mon, 2 Sep 2013 12:47:47 +0400
+Subject: [PATCH] lcd: paz00: ansi console implementation
+
+---
+ common/Makefile             |    1 +
+ common/ansi_console.c       |  210 +++++++++++++++++++++++++++++++++++++
+ common/lcd.c                |  131 +++++++++++++++++++++++-
+ drivers/video/cfb_console.c |  239 ++++++-------------------------------------
+ include/ansi_console.h      |   48 +++++++++
+ include/configs/paz00.h     |    5 +
+ 6 files changed, 421 insertions(+), 213 deletions(-)
+ create mode 100644 common/ansi_console.c
+ create mode 100644 include/ansi_console.h
+
+diff --git a/common/Makefile b/common/Makefile
+index 87ba82e..baf034c 100644
+--- a/common/Makefile
++++ b/common/Makefile
+@@ -189,6 +189,7 @@ COBJS-$(CONFIG_UPDATE_TFTP) += update.o
+ COBJS-$(CONFIG_USB_KEYBOARD) += usb_kbd.o
+ COBJS-$(CONFIG_CMD_DFU) += cmd_dfu.o
+ COBJS-$(CONFIG_CMD_GPT) += cmd_gpt.o
++COBJS-$(CONFIG_ANSI_CONSOLE) += ansi_console.o
+ endif
+ 
+ ifdef CONFIG_SPL_BUILD
+diff --git a/common/ansi_console.c b/common/ansi_console.c
+new file mode 100644
+index 0000000..f68e9c5
+--- /dev/null
++++ b/common/ansi_console.c
+@@ -0,0 +1,210 @@
++#include <ansi_console.h>
++
++
++void ansi_putc(struct ansi_console_t* console, const char c)
++{
++	int i;
++
++	if (c == 27) {
++		for (i = 0; i < console->ansi_buf_size; ++i)
++			console->putc(console->ansi_buf[i]);
++		console->ansi_buf[0] = 27;
++		console->ansi_buf_size = 1;
++		return;
++	}
++
++	if (console->ansi_buf_size > 0) {
++		/*
++		 * 0 - ESC
++		 * 1 - [
++		 * 2 - num1
++		 * 3 - ..
++		 * 4 - ;
++		 * 5 - num2
++		 * 6 - ..
++		 * - cchar
++		 */
++		int next = 0;
++
++		int flush = 0;
++		int fail = 0;
++
++		int num1 = 0;
++		int num2 = 0;
++		int cchar = 0;
++
++		console->ansi_buf[console->ansi_buf_size++] = c;
++
++		if (console->ansi_buf_size >= sizeof(console->ansi_buf))
++			fail = 1;
++
++		for (i = 0; i < console->ansi_buf_size; ++i) {
++			if (fail)
++				break;
++
++			switch (next) {
++			case 0:
++				if (console->ansi_buf[i] == 27)
++					next = 1;
++				else
++					fail = 1;
++				break;
++
++			case 1:
++				if (console->ansi_buf[i] == '[')
++					next = 2;
++				else
++					fail = 1;
++				break;
++
++			case 2:
++				if (console->ansi_buf[i] >= '0' && console->ansi_buf[i] <= '9') {
++					num1 = console->ansi_buf[i]-'0';
++					next = 3;
++				} else if (console->ansi_buf[i] != '?') {
++					--i;
++					num1 = 1;
++					next = 4;
++				}
++				break;
++
++			case 3:
++				if (console->ansi_buf[i] >= '0' && console->ansi_buf[i] <= '9') {
++					num1 *= 10;
++					num1 += console->ansi_buf[i]-'0';
++				} else {
++					--i;
++					next = 4;
++				}
++				break;
++
++			case 4:
++				if (console->ansi_buf[i] != ';') {
++					--i;
++					next = 7;
++				} else
++					next = 5;
++				break;
++
++			case 5:
++				if (console->ansi_buf[i] >= '0' && console->ansi_buf[i] <= '9') {
++					num2 = console->ansi_buf[i]-'0';
++					next = 6;
++				} else
++					fail = 1;
++				break;
++
++			case 6:
++				if (console->ansi_buf[i] >= '0' && console->ansi_buf[i] <= '9') {
++					num2 *= 10;
++					num2 += console->ansi_buf[i]-'0';
++				} else {
++					--i;
++					next = 7;
++				}
++				break;
++
++			case 7:
++				if ((console->ansi_buf[i] >= 'A' && console->ansi_buf[i] <= 'H')
++					|| console->ansi_buf[i] == 'J'
++					|| console->ansi_buf[i] == 'K'
++					|| console->ansi_buf[i] == 'h'
++					|| console->ansi_buf[i] == 'l'
++					|| console->ansi_buf[i] == 'm') {
++					cchar = console->ansi_buf[i];
++					flush = 1;
++				} else
++					fail = 1;
++				break;
++			}
++		}
++
++		if (fail) {
++			for (i = 0; i < console->ansi_buf_size; ++i)
++				console->putc(console->ansi_buf[i]);
++			console->ansi_buf_size = 0;
++			return;
++		}
++
++		if (flush) {
++			if (!console->ansi_cursor_hidden && console->cursor_enable)
++				console->cursor_enable(0);
++			console->ansi_buf_size = 0;
++			switch (cchar) {
++			case 'A':
++				/* move cursor num1 rows up */
++				console->cursor_up(num1);
++				break;
++			case 'B':
++				/* move cursor num1 rows down */
++				console->cursor_down(num1);
++				break;
++			case 'C':
++				/* move cursor num1 columns forward */
++				console->cursor_right(num1);
++				break;
++			case 'D':
++				/* move cursor num1 columns back */
++				console->cursor_left(num1);
++				break;
++			case 'E':
++				/* move cursor num1 rows up at begin of row */
++				console->previous_line(num1);
++				break;
++			case 'F':
++				/* move cursor num1 rows down at begin of row */
++				console->new_line(num1);
++				break;
++			case 'G':
++				/* move cursor to column num1 */
++				console->set_position(-1, num1-1);
++				break;
++			case 'H':
++				/* move cursor to row num1, column num2 */
++				console->set_position(num1-1, num2-1);
++				break;
++			case 'J':
++				/* clear console and move cursor to 0, 0 */
++				console->clear();
++				console->set_position(0, 0);
++				break;
++			case 'K':
++				/* clear line */
++				if (num1 == 0)
++					console->clear_line(*console->console_row,
++							*console->console_col,
++							-1);
++				else if (num1 == 1)
++					console->clear_line(*console->console_row,
++							0, *console->console_col);
++				else
++					console->clear_line(*console->console_row,
++							0, -1);
++				break;
++			case 'h':
++				console->ansi_cursor_hidden = 0;
++				break;
++			case 'l':
++				console->ansi_cursor_hidden = 1;
++				break;
++			case 'm':
++				if (num1 == 0) { /* reset swapped colors */
++					if (console->ansi_colors_need_revert && console->swap_colors) {
++						console->swap_colors();
++						console->ansi_colors_need_revert = 0;
++					}
++				} else if (num1 == 7) { /* once swap colors */
++					if (!console->ansi_colors_need_revert && console->swap_colors) {
++						console->swap_colors();
++						console->ansi_colors_need_revert = 1;
++					}
++				}
++				break;
++			}
++			if (!console->ansi_cursor_hidden && console->cursor_set)
++				console->cursor_set();
++		}
++	} else {
++		console->putc(c);
++	}
++}
+diff --git a/common/lcd.c b/common/lcd.c
+index 8d5c63c..e2cc161 100644
+--- a/common/lcd.c
++++ b/common/lcd.c
+@@ -28,6 +28,7 @@
+ #include <watchdog.h>
+ 
+ #include <splash.h>
++#include <ansi_console.h>
+ 
+ #if defined(CONFIG_CPU_PXA25X) || defined(CONFIG_CPU_PXA27X) || \
+ 	defined(CONFIG_CPU_MONAHANS)
+@@ -103,6 +104,7 @@
+ 
+ DECLARE_GLOBAL_DATA_PTR;
+ 
++void lcd_position_cursor_n(int col, int row);
+ static void lcd_drawchars(ushort x, ushort y, uchar *str, int count);
+ static inline void lcd_puts_xy(ushort x, ushort y, uchar *s);
+ static inline void lcd_putc_xy(ushort x, ushort y, uchar  c);
+@@ -114,6 +116,9 @@ static void *lcd_logo(void);
+ static int lcd_getbgcolor(void);
+ static void lcd_setfgcolor(int color);
+ static void lcd_setbgcolor(int color);
++#ifdef CONFIG_ANSI_CONSOLE
++static void lcd_swap_colors(void);
++#endif
+ 
+ static int lcd_color_fg;
+ static int lcd_color_bg;
+@@ -121,14 +126,24 @@ int lcd_line_length;
+ 
+ char lcd_is_enabled = 0;
+ 
++#ifdef CONFIG_ANSI_CONSOLE
++static int console_col;
++static int console_row;
++#else
+ static short console_col;
+ static short console_row;
++#endif
+ 
+ static void *lcd_console_address;
+ static void *lcd_base;			/* Start of framebuffer memory	*/
+ 
+ static char lcd_flush_dcache;	/* 1 to flush dcache after each lcd update */
+ 
++#ifdef CONFIG_ANSI_CONSOLE
++struct ansi_console_t ansi_console;
++#endif
++
++
+ /************************************************************************/
+ 
+ /* Flush LCD activity to the caches */
+@@ -155,9 +170,9 @@ void lcd_set_flush_dcache(int flush)
+ 
+ /*----------------------------------------------------------------------*/
+ 
+-static void console_scrollup(void)
++static void console_scrollup_n(int n)
+ {
+-	const int rows = CONFIG_CONSOLE_SCROLL_LINES;
++	const int rows = n;
+ 
+ 	/* Copy up rows ignoring those that will be overwritten */
+ 	memcpy(CONSOLE_ROW_FIRST,
+@@ -187,19 +202,85 @@ static inline void console_back(void)
+ 		console_row * VIDEO_FONT_HEIGHT, ' ');
+ }
+ 
++
+ /*----------------------------------------------------------------------*/
+ 
++static inline void console_newline_n(int n)
++{
++	console_col = 0;
++
++	console_row += n;
++	/* Check if we need to scroll the terminal */
++	if (console_row >= CONSOLE_ROWS)
++		console_scrollup_n(CONSOLE_ROWS - console_row + 1);
++	else
++		lcd_sync();
++}
++
+ static inline void console_newline(void)
+ {
++	console_newline_n(1);
++}
++
++/*----------------------------------------------------------------------*/
++
++static inline void console_prevline_n(int n)
++{
+ 	console_col = 0;
+ 
++	console_row -= n;
+ 	/* Check if we need to scroll the terminal */
+-	if (++console_row >= CONSOLE_ROWS)
+-		console_scrollup();
++	if (console_row < 0)
++		console_scrollup_n(1 - console_row);
+ 	else
+ 		lcd_sync();
+ }
+ 
++static inline void console_prevline(void)
++{
++	console_prevline_n(1);
++}
++
++/*----------------------------------------------------------------------*/
++
++static inline void console_cursor_up(int n)
++{
++	console_row -= n;
++	if (console_row < 0)
++		console_row = 0;
++}
++
++static inline void console_cursor_down(int n)
++{
++	console_row += n;
++	if (console_row >= CONSOLE_ROWS)
++		console_row = CONSOLE_ROWS-1;
++}
++
++static inline void console_cursor_left(int n)
++{
++	console_col -= n;
++	if (console_col < 0)
++		console_col = 0;
++}
++
++static inline void console_cursor_right(int n)
++{
++	console_col += n;
++	if (console_col >= CONSOLE_COLS)
++		console_col = CONSOLE_COLS-1;
++}
++
++/*----------------------------------------------------------------------*/
++
++static inline void console_clear_line(int line, int begin, int end)
++{
++	short i = 0;
++	for (i = begin; i < end; ++i)
++		lcd_putc_xy(i * VIDEO_FONT_WIDTH,
++			line * VIDEO_FONT_HEIGHT, ' ');
++}
++
+ /*----------------------------------------------------------------------*/
+ 
+ void lcd_putc(const char c)
+@@ -250,7 +331,11 @@ void lcd_puts(const char *s)
+ 	}
+ 
+ 	while (*s)
++#ifdef CONFIG_ANSI_CONSOLE
++		ansi_putc(&ansi_console, *s++);
++#else
+ 		lcd_putc(*s++);
++#endif
+ 
+ 	lcd_sync();
+ }
+@@ -509,6 +594,28 @@ static int lcd_init(void *lcdbase)
+ 	console_row = 1;	/* leave 1 blank line below logo */
+ #endif
+ 
++#ifdef CONFIG_ANSI_CONSOLE
++	memset(&ansi_console, 0, sizeof(ansi_console));
++	ansi_console.putc = lcd_putc;
++#if defined(CONFIG_CONSOLE_CURSOR) || defined(CONFIG_VIDEO_SW_CURSOR)
++	ansi_console.cursor_set = lcd_set_cursor;
++	ansi_console.cursor_enable = lcd_cursor;
++	/* TODO Add on/off */
++#endif
++	ansi_console.cursor_up = console_cursor_up;
++	ansi_console.cursor_down = console_cursor_down;
++	ansi_console.cursor_left = console_cursor_left;
++	ansi_console.cursor_right = console_cursor_right;
++	ansi_console.previous_line = console_prevline_n;
++	ansi_console.new_line = console_newline_n;
++	ansi_console.set_position = lcd_position_cursor_n;
++	ansi_console.clear_line = console_clear_line;
++	ansi_console.clear = lcd_clear;
++	ansi_console.swap_colors = lcd_swap_colors;
++	ansi_console.console_col = &console_col;
++	ansi_console.console_row = &console_row;
++#endif /* CONFIG_CONSOLE_ANSI */
++
+ 	return 0;
+ }
+ 
+@@ -574,6 +681,17 @@ static int lcd_getbgcolor(void)
+ 	return lcd_color_bg;
+ }
+ 
++/*----------------------------------------------------------------------*/
++
++#ifdef CONFIG_ANSI_CONSOLE
++static void lcd_swap_colors(void)
++{
++	int tmp = lcd_color_bg;
++	lcd_color_bg = lcd_color_fg;
++	lcd_color_fg = tmp;
++}
++#endif
++
+ /************************************************************************/
+ /* ** Chipset depending Bitmap / Logo stuff...                          */
+ /************************************************************************/
+@@ -1126,6 +1244,11 @@ void lcd_position_cursor(unsigned col, unsigned row)
+ 	console_row = min(row, CONSOLE_ROWS - 1);
+ }
+ 
++void lcd_position_cursor_n(int row, int col)
++{
++	lcd_position_cursor((unsigned)col, (unsigned)row);
++}
++
+ int lcd_get_pixel_width(void)
+ {
+ 	return panel_info.vl_col;
+diff --git a/drivers/video/cfb_console.c b/drivers/video/cfb_console.c
+index 96ef8f9..1aebf76 100644
+--- a/drivers/video/cfb_console.c
++++ b/drivers/video/cfb_console.c
+@@ -90,6 +90,7 @@
+ #include <version.h>
+ #include <malloc.h>
+ #include <linux/compiler.h>
++#include <ansi_console.h>
+ 
+ /*
+  * Console device defines with SMI graphic
+@@ -372,10 +373,7 @@ static u32 eorx, fgx, bgx;	/* color pats */
+ static int cfb_do_flush_cache;
+ 
+ #ifdef CONFIG_CFB_CONSOLE_ANSI
+-static char ansi_buf[10];
+-static int ansi_buf_size;
+-static int ansi_colors_need_revert;
+-static int ansi_cursor_hidden;
++struct ansi_console_t ansi_console;
+ #endif
+ 
+ static const int video_font_draw_table8[] = {
+@@ -836,7 +834,7 @@ static void console_swap_colors(void)
+ 
+ static inline int console_cursor_is_visible(void)
+ {
+-	return !ansi_cursor_hidden;
++	return !ansi_console.ansi_cursor_hidden;
+ }
+ #else
+ static inline int console_cursor_is_visible(void)
+@@ -917,210 +915,7 @@ static void parse_putc(const char c)
+ void video_putc(const char c)
+ {
+ #ifdef CONFIG_CFB_CONSOLE_ANSI
+-	int i;
+-
+-	if (c == 27) {
+-		for (i = 0; i < ansi_buf_size; ++i)
+-			parse_putc(ansi_buf[i]);
+-		ansi_buf[0] = 27;
+-		ansi_buf_size = 1;
+-		return;
+-	}
+-
+-	if (ansi_buf_size > 0) {
+-		/*
+-		 * 0 - ESC
+-		 * 1 - [
+-		 * 2 - num1
+-		 * 3 - ..
+-		 * 4 - ;
+-		 * 5 - num2
+-		 * 6 - ..
+-		 * - cchar
+-		 */
+-		int next = 0;
+-
+-		int flush = 0;
+-		int fail = 0;
+-
+-		int num1 = 0;
+-		int num2 = 0;
+-		int cchar = 0;
+-
+-		ansi_buf[ansi_buf_size++] = c;
+-
+-		if (ansi_buf_size >= sizeof(ansi_buf))
+-			fail = 1;
+-
+-		for (i = 0; i < ansi_buf_size; ++i) {
+-			if (fail)
+-				break;
+-
+-			switch (next) {
+-			case 0:
+-				if (ansi_buf[i] == 27)
+-					next = 1;
+-				else
+-					fail = 1;
+-				break;
+-
+-			case 1:
+-				if (ansi_buf[i] == '[')
+-					next = 2;
+-				else
+-					fail = 1;
+-				break;
+-
+-			case 2:
+-				if (ansi_buf[i] >= '0' && ansi_buf[i] <= '9') {
+-					num1 = ansi_buf[i]-'0';
+-					next = 3;
+-				} else if (ansi_buf[i] != '?') {
+-					--i;
+-					num1 = 1;
+-					next = 4;
+-				}
+-				break;
+-
+-			case 3:
+-				if (ansi_buf[i] >= '0' && ansi_buf[i] <= '9') {
+-					num1 *= 10;
+-					num1 += ansi_buf[i]-'0';
+-				} else {
+-					--i;
+-					next = 4;
+-				}
+-				break;
+-
+-			case 4:
+-				if (ansi_buf[i] != ';') {
+-					--i;
+-					next = 7;
+-				} else
+-					next = 5;
+-				break;
+-
+-			case 5:
+-				if (ansi_buf[i] >= '0' && ansi_buf[i] <= '9') {
+-					num2 = ansi_buf[i]-'0';
+-					next = 6;
+-				} else
+-					fail = 1;
+-				break;
+-
+-			case 6:
+-				if (ansi_buf[i] >= '0' && ansi_buf[i] <= '9') {
+-					num2 *= 10;
+-					num2 += ansi_buf[i]-'0';
+-				} else {
+-					--i;
+-					next = 7;
+-				}
+-				break;
+-
+-			case 7:
+-				if ((ansi_buf[i] >= 'A' && ansi_buf[i] <= 'H')
+-					|| ansi_buf[i] == 'J'
+-					|| ansi_buf[i] == 'K'
+-					|| ansi_buf[i] == 'h'
+-					|| ansi_buf[i] == 'l'
+-					|| ansi_buf[i] == 'm') {
+-					cchar = ansi_buf[i];
+-					flush = 1;
+-				} else
+-					fail = 1;
+-				break;
+-			}
+-		}
+-
+-		if (fail) {
+-			for (i = 0; i < ansi_buf_size; ++i)
+-				parse_putc(ansi_buf[i]);
+-			ansi_buf_size = 0;
+-			return;
+-		}
+-
+-		if (flush) {
+-			if (!ansi_cursor_hidden)
+-				CURSOR_OFF;
+-			ansi_buf_size = 0;
+-			switch (cchar) {
+-			case 'A':
+-				/* move cursor num1 rows up */
+-				console_cursor_up(num1);
+-				break;
+-			case 'B':
+-				/* move cursor num1 rows down */
+-				console_cursor_down(num1);
+-				break;
+-			case 'C':
+-				/* move cursor num1 columns forward */
+-				console_cursor_right(num1);
+-				break;
+-			case 'D':
+-				/* move cursor num1 columns back */
+-				console_cursor_left(num1);
+-				break;
+-			case 'E':
+-				/* move cursor num1 rows up at begin of row */
+-				console_previousline(num1);
+-				break;
+-			case 'F':
+-				/* move cursor num1 rows down at begin of row */
+-				console_newline(num1);
+-				break;
+-			case 'G':
+-				/* move cursor to column num1 */
+-				console_cursor_set_position(-1, num1-1);
+-				break;
+-			case 'H':
+-				/* move cursor to row num1, column num2 */
+-				console_cursor_set_position(num1-1, num2-1);
+-				break;
+-			case 'J':
+-				/* clear console and move cursor to 0, 0 */
+-				console_clear();
+-				console_cursor_set_position(0, 0);
+-				break;
+-			case 'K':
+-				/* clear line */
+-				if (num1 == 0)
+-					console_clear_line(console_row,
+-							console_col,
+-							CONSOLE_COLS-1);
+-				else if (num1 == 1)
+-					console_clear_line(console_row,
+-							0, console_col);
+-				else
+-					console_clear_line(console_row,
+-							0, CONSOLE_COLS-1);
+-				break;
+-			case 'h':
+-				ansi_cursor_hidden = 0;
+-				break;
+-			case 'l':
+-				ansi_cursor_hidden = 1;
+-				break;
+-			case 'm':
+-				if (num1 == 0) { /* reset swapped colors */
+-					if (ansi_colors_need_revert) {
+-						console_swap_colors();
+-						ansi_colors_need_revert = 0;
+-					}
+-				} else if (num1 == 7) { /* once swap colors */
+-					if (!ansi_colors_need_revert) {
+-						console_swap_colors();
+-						ansi_colors_need_revert = 1;
+-					}
+-				}
+-				break;
+-			}
+-			if (!ansi_cursor_hidden)
+-				CURSOR_SET;
+-		}
+-	} else {
+-		parse_putc(c);
+-	}
++	ansi_putc(&ansi_console, c);
+ #else
+ 	parse_putc(c);
+ #endif
+@@ -2177,6 +1972,32 @@ static int video_init(void)
+ 	if (cfb_do_flush_cache)
+ 		flush_cache(VIDEO_FB_ADRS, VIDEO_SIZE);
+ 
++	memset(&ansi_console, 0, sizeof(ansi_console));
++	ansi_console.putc = parse_putc;
++
++#if defined(CONFIG_CONSOLE_CURSOR) || defined(CONFIG_VIDEO_SW_CURSOR)
++	ansi_console.cursor_set = video_set_cursor;
++	ansi_console.cursor_enable = console_cursor;
++	/* TODO Add on/off */
++#endif
++	ansi_console.cursor_up = console_cursor_up;
++	ansi_console.cursor_up = console_cursor_up;
++	ansi_console.cursor_down = console_cursor_down;
++	ansi_console.cursor_left = console_cursor_left;
++	ansi_console.cursor_right = console_cursor_right;
++	ansi_console.previous_line = console_previousline;
++	ansi_console.new_line = console_newline;
++
++	ansi_console.set_position = console_cursor_set_position;
++
++	ansi_console.clear_line = console_clear_line;
++
++	ansi_console.clear = console_clear;
++	ansi_console.swap_colors = console_swap_colors;
++
++	ansi_console.console_col = &console_col;
++	ansi_console.console_row = &console_row;
++
+ 	return 0;
+ }
+ 
+diff --git a/include/ansi_console.h b/include/ansi_console.h
+new file mode 100644
+index 0000000..fdc4f76
+--- /dev/null
++++ b/include/ansi_console.h
+@@ -0,0 +1,48 @@
++/*
++ * (C) Copyright 2012
++ * Pali Rohár <pali.rohar@gmail.com>
++ *
++ * SPDX-License-Identifier:	GPL-2.0+
++ */
++
++/*
++ * ANSI terminal
++ */
++
++#include <common.h>
++
++typedef void (ansi_console_f)(void);
++typedef void (ansi_console_char_f)(const char c);
++typedef void (ansi_console_cursor_f)(int n);
++typedef void (ansi_console_pos_f)(int x, int y);
++typedef void (ansi_console_line_f)(int n, int start, int end);
++
++struct ansi_console_t {
++	ansi_console_char_f* putc;
++
++	ansi_console_f*        cursor_set;
++	ansi_console_cursor_f* cursor_enable;
++	ansi_console_cursor_f* cursor_up;
++	ansi_console_cursor_f* cursor_down;
++	ansi_console_cursor_f* cursor_left;
++	ansi_console_cursor_f* cursor_right;
++	ansi_console_cursor_f* previous_line;
++	ansi_console_cursor_f* new_line;
++
++	ansi_console_pos_f*    set_position;
++
++	ansi_console_line_f*   clear_line;
++
++	ansi_console_f*        clear;
++	ansi_console_f*        swap_colors;
++
++	int* console_col;
++	int* console_row;
++
++	char ansi_buf[10];
++	int ansi_buf_size;
++	int ansi_colors_need_revert;
++	int ansi_cursor_hidden;
++};
++
++void ansi_putc(struct ansi_console_t* console, const char c);
+diff --git a/include/configs/paz00.h b/include/configs/paz00.h
+index 640ba9a..4bce0dc 100644
+--- a/include/configs/paz00.h
++++ b/include/configs/paz00.h
+@@ -77,6 +77,11 @@
+ #define CONFIG_TEGRA_NVEC
+ #define CONFIG_TEGRA_NVEC_KEYBOARD
+ 
++#define CONFIG_ANSI_CONSOLE
++#define CONFIG_CMD_BOOTMENU
++#define CONFIG_MENU
++#define CONFIG_AUTOBOOT_KEYED
++
+ #include "tegra-common-post.h"
+ 
+ #define CONFIG_INITRD_TAG 1
+-- 
+1.7.9.5
+

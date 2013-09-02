@@ -1,2 +1,5 @@
+echo "== ram script with boot menu =="
 setenv bootargs 'console=tty0 console=ttyS0,115200n8 CMA=64M quiet splash tegrapart=recovery:300:a00:800,boot:d00:1000:800,mbr:1d00:200:800 nvtegra_hideparts=BCT,PT,EBT,MBR,EM1,EM2'
-bootz @KERNEL @INITRD @FDT
+setenv bootmenu_0 "Boot kernel=bootz @KERNEL @INITRD @FDT"
+setenv bootmenu_1 "Test=echo test"
+bootmenu 20
