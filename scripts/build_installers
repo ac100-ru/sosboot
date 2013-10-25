@@ -1,8 +1,10 @@
 #!/bin/bash
 #
 
+echo "Updating uboot.bin..."
 cp ./build/uboot.bin ac100-self-installers/switch-to-uboot/uboot.bin || exit 1
 
+echo "Building..."
 pushd ac100-self-installers || exit 1
 ./build_all
 popd
