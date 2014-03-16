@@ -8,8 +8,8 @@
 ./scripts/get_uboot || exit 1
 ./scripts/build_uboot || exit 1
 
-./scripts/get_tegrarcm || exit 1
-./scripts/build_tegrarcm || exit 1
+#./scripts/get_tegrarcm || exit 1
+#./scripts/build_tegrarcm || exit 1
 
 ./scripts/get_createimage || exit 1
 
