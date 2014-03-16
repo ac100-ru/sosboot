@@ -21,17 +21,17 @@ res=$?
 if [[ "$res" == "0" ]]; then
 	detach="--detach"
 fi
-git checkout -f $detach 2012.11.1
+git checkout -f $detach 2013.11
 git clean -f -d
 
 cd ..
 
 echo
-for p in patches/buildroot-*.patch; do
-    echo "Applying patch $p ..."
-    patch -d buildroot -p1 < $p
-    echo
-done
+#for p in patches/buildroot-*.patch; do
+#    echo "Applying patch $p ..."
+#    patch -d buildroot -p1 < $p
+#    echo
+#done
 
 echo "done."
 
