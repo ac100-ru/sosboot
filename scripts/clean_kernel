@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+
+if [ -d build/kernel ]; then
+    echo
+    echo "Cleaning kernel binaries..."
+    cd build
+    rm -rf kernel
+    rm zImage*
+    rm tegra*
+    cd ..
+fi
+
+if [ -d kernel ]; then
+    echo
+    echo "Cleaning kernel source..."
+    cd kernel
+    make ARCH=arm mrproper
+fi
+
+echo "done."
+

@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+
+if [ -d buildroot ]; then
+    echo
+    echo "Cleaning buildroot..."
+    cd buildroot
+    make distclean
+    cd ..
+fi
+
+echo "done."
+
