@@ -7,13 +7,10 @@ mkdir -p build/target
 ln -sf ../target build/buildroot/target
 
 cp config/busybox.config buildroot/package/busybox/busybox.config
-cp config/buildroot.config build/buildroot/.config
+cp config/buildroot_paz00_defconfig buildroot/configs/paz00_defconfig
+#cp config/buildroot.config build/buildroot/.config
+cp config/inittab buildroot/system/skeleton/etc/inittab
 
-ncpu=$(grep -c ^processor /proc/cpuinfo)
-if [ "$ncpu" -gt 1 ]; then
-    sed -i -e "s/BR2_JLEVEL=.*$/BR2_JLEVEL=$ncpu/" build/buildroot/.config
-fi
-
-make -C buildroot O=$PWD/build/buildroot oldconfig
+make -C buildroot O=$PWD/build/buildroot paz00_defconfig
 
 
