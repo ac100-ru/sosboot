@@ -8,3 +8,4 @@ if [ ! -d create_bootimage ]; then
     ln -s $PWD/create_bootimage/create_image.pl $PWD/build
 fi
 
+ln -s $PWD/create_bootimage/create_image.pl $PWD/build
