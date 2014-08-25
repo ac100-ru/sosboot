@@ -1,23 +1,14 @@
 #!/bin/sh
 #
 
-./scripts/get_kernel || exit 1
 ./scripts/configure_kernel || exit 1
 ./scripts/build_kernel || exit 1
 
-./scripts/get_uboot || exit 1
 ./scripts/build_uboot || exit 1
 
-#./scripts/get_tegrarcm || exit 1
-#./scripts/build_tegrarcm || exit 1
-
-./scripts/get_createimage || exit 1
-
-./scripts/get_buildroot || exit 1
 ./scripts/configure_buildroot || exit 1
 ./scripts/build_buildroot || exit 1
 
-./scripts/get_installers || exit 1
 ./scripts/build_installers || exit 1
 
 ./scripts/build_sosboot || exit 1
