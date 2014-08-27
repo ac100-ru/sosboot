@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 SOS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-EABI_DIR="$SOS_DIR/toolchain_prebuilt/arm-linux-gnueabi-linaro_4.9.1-2014.07/bin"
+EABI_DIR="$SOS_DIR/toolchain_prebuilt/arm-linux-gnueabi-linaro_4.8.3-2014.04/bin"
 
 if [[ :$PATH: == *:"$EABI_DIR":* ]] ; then
     echo "$EABI_DIR on bash path"
