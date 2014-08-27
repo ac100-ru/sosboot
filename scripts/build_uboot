@@ -1,5 +1,14 @@
 #!/bin/bash
 #
+SOS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+EABI_DIR="$SOS_DIR/toolchain_prebuilt/arm-linux-gnueabi-linaro_4.9.1-2014.07/bin"
+
+if [[ :$PATH: == *:"$EABI_DIR":* ]] ; then
+    echo "$EABI_DIR on bash path"
+else
+    echo "Add $EABI_DIR to bash path"
+    export PATH=$PATH:$EABI_DIR
+fi
 
 OPTS=
 
@@ -8,7 +17,7 @@ if [ "$ncpu" -gt 1 ]; then
     OPTS="$OPTS -j$ncpu"
 fi
 
-make -C uboot paz00_config CROSS_COMPILE="ccache arm-none-linux-gnueabi-" O=$PWD/build/uboot $OPTS || exit 1
-make -C uboot CROSS_COMPILE="ccache arm-none-linux-gnueabi-" O=$PWD/build/uboot $OPTS || exit 1
+make -C uboot paz00_config CROSS_COMPILE="ccache arm-linux-gnueabi-" O=$PWD/build/uboot $OPTS || exit 1
+make -C uboot CROSS_COMPILE="ccache arm-linux-gnueabi-" O=$PWD/build/uboot $OPTS || exit 1
 
 ln -sf $PWD/build/uboot/u-boot-dtb-tegra.bin build/uboot.bin
