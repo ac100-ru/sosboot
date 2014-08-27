@@ -10,3 +10,6 @@ tegrarcm
 *.bin
 tags
 ac100-self-installers
+.repo
+android-installer
+kernel-mainline
