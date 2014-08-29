@@ -13,5 +13,5 @@ fi
 mkdir -p build/kernel
 cp config/paz00_sosboot_defconfig kernel/arch/arm/configs/
 
-make -C kernel ARCH=arm CROSS_COMPILE="ccache arm-linux-gnueabi-" O=$PWD/build/kernel paz00_sosboot_defconfig
+make -C kernel ARCH=arm CROSS_COMPILE="arm-linux-gnueabi-" O=$PWD/build/kernel paz00_sosboot_defconfig
 
