@@ -1,0 +1,24 @@
+Sosboot for Toshiba AC100
+=========================
+
+This is small embedded system for Toshiba AC100 recovery.
+
+Get sources
+===========
+
+Install git-repo:
+
+$ curl https://storage.googleapis.com/git-repo-downloads/repo > ~/bin/repo
+$ chmod a+x ~/bin/repo
+
+
+Init repo manifest in some folder:
+repo init -u git://github.com/ac100-ru/sosboot-manifests.git -b for-next
+
+Download system sources:
+repo sync
+
+Compile
+=======
+
+Run ./build_all bash script or scipts in ./scripts folder for individual parts
