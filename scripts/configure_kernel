@@ -1,17 +1,10 @@
 #!/bin/bash
 #
 SOS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-EABI_DIR="$SOS_DIR/toolchain_prebuilt/arm-linux-gnueabi-linaro_4.8.3-2014.04/bin"
-
-if [[ :$PATH: == *:"$EABI_DIR":* ]] ; then
-    echo "$EABI_DIR on bash path"
-else
-    echo "Add $EABI_DIR to bash path"
-    export PATH=$PATH:$EABI_DIR
-fi
+EABI_DIR="$SOS_DIR/toolchain_prebuilt/arm-2014.05/bin"
 
 mkdir -p build/kernel
 cp config/paz00_sosboot_defconfig kernel/arch/arm/configs/
 
-make -C kernel ARCH=arm CROSS_COMPILE="arm-linux-gnueabi-" O=$PWD/build/kernel paz00_sosboot_defconfig
+make -C kernel ARCH=arm CROSS_COMPILE="$EABI_DIR/arm-linux-gnueabi-" O=$PWD/build/kernel paz00_sosboot_defconfig
 

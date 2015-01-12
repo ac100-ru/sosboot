@@ -1,6 +1,16 @@
 #!/bin/bash
 #
 
+SOS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+EABI_DIR="$SOS_DIR/toolchain_prebuilt/arm-2014.05/bin"
+
+if [[ :$PATH: == *:"$EABI_DIR":* ]] ; then
+    echo "$EABI_DIR on bash path"
+else
+    echo "Add $EABI_DIR to bash path"
+    export PATH=$PATH:$EABI_DIR
+fi
+
 make -C build/buildroot $OPTS world
 
 cp release build/target/etc/sosboot-release
