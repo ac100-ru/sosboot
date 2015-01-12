@@ -2,21 +2,21 @@
 #
 
 # Get prebuilt toolchain
-##./scripts/get_toolchain || exit 1
+./scripts/get_toolchain || exit 1
 
 ./scripts/configure_kernel || exit 1
 ./scripts/build_kernel || exit 1
 
-##./scripts/build_uboot || exit 1
+./scripts/build_uboot || exit 1
 
-##./scripts/configure_buildroot || exit 1
-##./scripts/build_buildroot || exit 1
+./scripts/configure_buildroot || exit 1
+./scripts/build_buildroot || exit 1
 
-##./scripts/build_installers || exit 1
+./scripts/build_installers || exit 1
 
-##./scripts/build_sosboot || exit 1
-##./scripts/build_bootimg || exit 1
-##./scripts/build_sos_uboot || exit 1
+./scripts/build_sosboot || exit 1
+./scripts/build_bootimg || exit 1
+./scripts/build_sos_uboot || exit 1
 
 #./scripts/flash_bootimage
 
