@@ -1,8 +1,8 @@
 #!/bin/bash
 
-if [ ! -d toolchain_prebuilt ]; then
-mkdir toolchain_prebuilt
-curl http://sourcery.mentor.com/public/gnu_toolchain/arm-none-linux-gnueabi/arm-2014.05-29-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2 > toolchain_prebuilt/arm-2014.05-29-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2
-tar xvfj toolchain_prebuilt/arm-2014.05-29-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2 -C toolchain_prebuilt
+if [ ! -d scripts/toolchain_prebuilt ]; then
+mkdir scripts/toolchain_prebuilt
+curl http://sourcery.mentor.com/public/gnu_toolchain/arm-none-linux-gnueabi/arm-2014.05-29-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2 > scripts/toolchain_prebuilt/arm-2014.05-29-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2
+tar xvfj toolchain_prebuilt/arm-2014.05-29-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2 -C scripts/toolchain_prebuilt
 fi
 

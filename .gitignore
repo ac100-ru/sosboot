@@ -13,4 +13,4 @@ ac100-self-installers
 .repo
 android-installer
 kernel-mainline
-toolchain_prebuilt/
+scripts/toolchain_prebuilt/
