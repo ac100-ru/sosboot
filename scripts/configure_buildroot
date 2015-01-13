@@ -11,7 +11,7 @@ else
     export PATH=$PATH:$EABI_DIR
 fi
 
-sed -i"" -e "s/\$EABI_DIR/$EABI_DIR/g" config/buildroot_paz00_defconfig
+sed -i"" -e 's,$EABI_DIR,'"$EABI_DIR"',' config/buildroot_paz00_defconfig
 
 mkdir -p build/buildroot
 mkdir -p build/target
