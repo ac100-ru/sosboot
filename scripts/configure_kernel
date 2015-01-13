@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 SOS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-EABI_DIR="$SOS_DIR/toolchain_prebuilt/arm-2014.05/bin"
+EABI_DIR="$SOS_DIR/toolchain_prebuilt/arm-2011.03/bin"
 
 mkdir -p build/kernel
 cp config/paz00_sosboot_defconfig kernel/arch/arm/configs/
