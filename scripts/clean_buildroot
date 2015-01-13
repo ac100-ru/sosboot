@@ -1,5 +1,12 @@
 #!/bin/bash
 #
+if [ -d build/buildroot ]; then
+    echo
+    echo "Cleaning buildroot binaries..."
+    cd build
+    rm -rf buildroot
+    cd ..
+fi
 
 if [ -d buildroot ]; then
     echo
