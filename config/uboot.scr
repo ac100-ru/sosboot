@@ -1,5 +1,5 @@
 echo "== ram script with boot menu =="
-setenv bootargs 'console=tty0 console=ttyS0,115200n8 CMA=64M quiet splash tegrapart=recovery:300:a00:800,boot:d00:1000:800,mbr:1d00:200:800 nvtegra_hideparts=BCT,PT,EBT,MBR,EM1,EM2'
+setenv bootargs 'console=tty0 console=ttyS0,115200n8 no_console_suspend=1 ignore_loglevel earlyprintk initcall_debug blkdevparts=mmcblk1:5343880[@5767168](SOS),8488608(LNX),1048576(MBR)'
 setenv bootmenu_0 "Boot kernel=bootz @KERNEL @INITRD @FDT"
 setenv bootmenu_1 "Test=echo test"
 bootmenu 20
