@@ -13,10 +13,15 @@ $ chmod a+x ~/bin/repo
 
 
 Init repo manifest in some folder:
-repo init -u git://github.com/ac100-ru/sosboot-manifests.git -b for-next
+repo init -u git://github.com/ac100-ru/sosboot-manifests.git -b for-next-v1
 
 Download system sources:
 repo sync
+
+Build Requirements
+==================
+
+Dont forget to install dtc, fakeroot and perl File::Slurp
 
 Compile
 =======
