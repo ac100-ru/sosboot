@@ -19,7 +19,7 @@ mkdir -p build/target
 ln -sf ../target build/buildroot/target
 
 cp config/busybox.config buildroot/package/busybox/busybox.config
-cp config/buildroot_paz00_defconfig buildroot/configs/paz00_defconfig
+#cp config/buildroot_paz00_defconfig buildroot/configs/paz00_defconfig
 #cp config/buildroot.config build/buildroot/.config
 cp config/inittab buildroot/system/skeleton/etc/inittab
 
