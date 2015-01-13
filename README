@@ -18,6 +18,11 @@ repo init -u git://github.com/ac100-ru/sosboot-manifests.git -b for-next
 Download system sources:
 repo sync
 
+Build Requirements
+==================
+
+Dont forget to install dtc, fakeroot and perl File::Slurp
+
 Compile
 =======
 
