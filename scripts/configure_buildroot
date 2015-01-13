@@ -11,12 +11,12 @@ else
     export PATH=$PATH:$EABI_DIR
 fi
 
-cat config/buildroot_paz00_defconfig | sed -e 's,$EABI_DIR,'"$EABI_DIR"',' buildroot/configs/paz00_defconfig
-
 mkdir -p build/buildroot
 mkdir -p build/target
 
 ln -sf ../target build/buildroot/target
+
+sed -e 's,$EABI_DIR,'"$EABI_DIR"',' config/buildroot_paz00_defconfig > buildroot/configs/paz00_defconfig
 
 cp config/busybox.config buildroot/package/busybox/busybox.config
 #cp config/buildroot_paz00_defconfig buildroot/configs/paz00_defconfig
