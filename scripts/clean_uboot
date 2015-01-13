@@ -1,0 +1,21 @@
+#!/bin/bash
+#
+
+if [ -d build/uboot ]; then
+    echo
+    echo "Cleaning uboot binaries..."
+    cd build
+    rm -rf uboot
+    rm uboot.bin
+    cd ..
+fi
+
+if [ -d uboot ]; then
+    echo
+    echo "Cleaning uboot source..."
+    cd uboot
+    make ARCH=arm mrproper
+fi
+
+echo "done."
+
