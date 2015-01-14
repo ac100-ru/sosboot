@@ -1,0 +1,11 @@
+#!/bin/bash
+#
+
+if ls sos-uboot* 1> /dev/null 2>&1; then
+    echo
+    echo "Cleaning sos-uboot image..."
+    rm sos-uboot*
+fi
+
+echo "done."
+

@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+
+if [ -f build/initrd.img ]; then
+    echo
+    echo "Cleaning sosboot initrd image..."
+    cd build
+    rm initrd.img
+    cd ..
+fi
+
+if [ -f sosboot-r5-alpha.img ]; then
+    echo 
+    echo "Cleaning sosboot image..."
+    rm sosboot-r5-alpha.img
+fi
+
+echo "done."
+
