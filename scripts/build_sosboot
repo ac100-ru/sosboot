@@ -1,8 +1,8 @@
 #!/bin/bash
 #
 
-#rm -f build/target/init
-#install sosboot/init build/target
+rm -f build/target/init
+install sosboot/init build/target
 
 fakeroot ./scripts/pack_initrd -f build/initrd.img build/target -e uboot -e cbootimage -e curses -e iconv -e readline
 

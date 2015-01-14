@@ -3,8 +3,8 @@
 
 rel=$(cat release)
 
-#rm -f build/target/init
-#install sosboot/init build/target
+rm -f build/target/init
+install sosboot/init build/target
 
 fakeroot ./scripts/pack_initrd -f build/initrd-large.img build/target || exit 1
 
