@@ -21,7 +21,7 @@ sed -e 's,$EABI_DIR,'"$EABI_DIR"',' config/buildroot_paz00_defconfig > buildroot
 cp config/busybox.config buildroot/package/busybox/busybox.config
 #cp config/buildroot_paz00_defconfig buildroot/configs/paz00_defconfig
 #cp config/buildroot.config build/buildroot/.config
-cp config/inittab buildroot/system/skeleton/etc/inittab
+#cp config/inittab buildroot/system/skeleton/etc/inittab
 
 make -C buildroot O=$PWD/build/buildroot paz00_defconfig
 
