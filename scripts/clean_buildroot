@@ -8,6 +8,14 @@ if [ -d build/buildroot ]; then
     cd ..
 fi
 
+if [ -d build/target ]; then
+    echo
+    echo "Cleaning buildroot target binaries..."
+    cd build
+    rm -rf target
+    cd ..
+fi
+
 if [ -d buildroot ]; then
     echo
     echo "Cleaning buildroot..."

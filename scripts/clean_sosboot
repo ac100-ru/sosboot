@@ -5,7 +5,7 @@ if [ -f build/initrd.img ]; then
     echo
     echo "Cleaning sosboot initrd image..."
     cd build
-    rm initrd.img
+    rm initrd*
     cd ..
 fi
 
