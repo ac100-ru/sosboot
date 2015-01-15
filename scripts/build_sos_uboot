@@ -6,7 +6,7 @@ rel=$(cat release)
 rm -f build/target/init
 install sosboot/init build/target
 rm build/target/etc/inittab
-install config/inittab build/target/etc
+install sosboot/inittab build/target/etc
 
 fakeroot ./scripts/pack_initrd -f build/initrd-large.img build/target || exit 1
 
