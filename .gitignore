@@ -8,6 +8,7 @@ uboot
 tegrarcm
 *.img
 *.bin
+*.tar
 tags
 ac100-self-installers
 .repo
