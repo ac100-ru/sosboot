@@ -11,3 +11,6 @@ popd
 
 cp ac100-self-installers/build/switch-to-uboot ./build/target || exit 1
 
+echo "Install android installer to target fs..."
+install android-installer/installer build/target
+
