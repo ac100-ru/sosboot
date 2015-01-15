@@ -13,7 +13,7 @@ $ chmod a+x ~/bin/repo
 
 
 Init repo manifest in some folder:
-repo init -u git://github.com/ac100-ru/sosboot-manifests.git -b for-next
+repo init -u git://github.com/ac100-ru/sosboot-manifests.git -b sosboot-ng
 
 Download system sources:
 repo sync
@@ -27,3 +27,9 @@ Compile
 =======
 
 Run ./build_all bash script or scipts in ./scripts folder for individual parts
+
+Clean
+=====
+
+Run ./clean_all bash script or clean_* scripts in ./scripts folder to clean
+binaries for individual parts
