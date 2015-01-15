@@ -1,0 +1,6 @@
+#!/bin/sh
+./scripts/clean_kernel || exit 1
+./scripts/clean_uboot || exit 1
+./scripts/clean_buildroot || exit 1
+./scripts/clean_sosboot || exit 1
+./scripts/clean_sos-uboot || exit 1
