@@ -1,5 +1,7 @@
 #!/bin/bash
 #
+SOS_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+EABI_DIR="$SOS_DIR/toolchain_prebuilt/arm-2014.05/bin"
 
 OPTS=
 
@@ -12,7 +14,7 @@ pushd cbootimage
 ./autogen.sh || exit 1
 ./configure || exit 1
 popd
-make -C cbootimage $OPTS || exit 1
+make -C cbootimage CROSS_COMPILE="$EABI_DIR/arm-none-linux-gnueabi-" $OPTS || exit 1
 
 cp $PWD/cbootimage/src/bct_dump build/target/usr/bin
 cp $PWD/cbootimage/src/cbootimage build/target/usr/bin
