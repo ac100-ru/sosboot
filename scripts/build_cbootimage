@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+
+OPTS=
+
+ncpu=$(grep -c ^processor /proc/cpuinfo)
+if [ "$ncpu" -gt 1 ]; then
+    OPTS="$OPTS -j$ncpu"
+fi
+
+pushd cbootimage
+./autogen.sh || exit 1
+./configure || exit 1
+popd
+make -C cbootimage $OPTS || exit 1
+
+cp $PWD/cbootimage/src/bct_dump build/target/usr/bin
+cp $PWD/cbootimage/src/cbootimage build/target/usr/bin

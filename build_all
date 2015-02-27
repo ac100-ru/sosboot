@@ -13,6 +13,7 @@
 ./scripts/build_buildroot || exit 1
 
 ./scripts/build_installers || exit 1
+./scripts/build_cbootimage || exit 1
 
 ./scripts/build_sosboot || exit 1
 ./scripts/build_bootimg || exit 1
