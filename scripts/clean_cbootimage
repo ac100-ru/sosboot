@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+
+if [ -d cbootimage ]; then
+    echo
+    echo "Cleaning cbootimage source..."
+    cd cbootimage
+    make distclean
+fi
+
+echo "done."
+
