@@ -16,3 +16,4 @@ android-installer
 kernel-mainline
 scripts/toolchain_prebuilt/
 cbootimage
+abootimg
