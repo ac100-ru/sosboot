@@ -41,7 +41,7 @@ CONFIG_ZSMALLOC=y
 # CONFIG_ATAGS is not set
 CONFIG_ZBOOT_ROM_TEXT=0x0
 CONFIG_ZBOOT_ROM_BSS=0x0
-CONFIG_CMDLINE="console=tty0 console=ttyS0,115200n8 no_console_suspend=1 ignore_loglevel earlyprintk initcall_debug blkdevparts=mmcblk1:5343880[@5767168](SOS),8488608(LNX),1048576(MBR)"
+CONFIG_CMDLINE="console=tty0 console=ttyS0,115200n8 no_console_suspend=1 ignore_loglevel earlyprintk initcall_debug"
 CONFIG_CPU_FREQ=y
 CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND=y
 CONFIG_CPU_IDLE=y
