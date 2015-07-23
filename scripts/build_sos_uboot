@@ -7,6 +7,7 @@ rm -f build/target/init
 install sosboot/init build/target
 rm build/target/etc/inittab
 install sosboot/inittab build/target/etc
+install sosboot/S60Gpm build/target/etc/init.d
 
 fakeroot ./scripts/pack_initrd -f build/initrd-large.img build/target || exit 1
 
