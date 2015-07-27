@@ -31,7 +31,7 @@ null::sysinit:/bin/hostname -F /etc/hostname
 # this yourself...
 #
 # Start an "askfirst" shell on the console (whatever that may be)
-::askfirst:-/bin/sh
+#::askfirst:-/bin/sh
 # Start an "askfirst" shell on /dev/tty2-4
 tty1::askfirst:-/bin/sh
 tty2::askfirst:-/bin/sh
